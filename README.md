@@ -22,6 +22,8 @@ The repository contains a single SCSS file with the following mixins:
 
 8. **Aspect Ratio Boxes**: This mixin helps you create boxes with a specified aspect ratio.
 
+9. **Skew Background Transition**: This mixin helps create a skew background transition effect with specified color values (`$initial` and `$hover`) and a boolean (`$inverted`) as arguments.
+
 ## Usage
 
 To use these mixins, simply import the SCSS file in your project and include the mixins in your SCSS code. For example:

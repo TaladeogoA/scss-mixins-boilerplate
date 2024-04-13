@@ -1,0 +1,137 @@
+$breakpoints: (
+  "phone": 425px,
+  "tablet": 768px,
+  "desktop": 1366px,
+  "LGdesktop": 1920px,
+) !default;
+
+$base-font-size: 16px !default;
+
+// Mixin for max-width media query (desktop-first)
+// Use this mixin when you want to apply styles for viewports with a width up to and including the specified breakpoint.
+// For example, `@include respond-up-to('medium') { ... }` will apply the styles for viewports with a width up to and including the 'medium' breakpoint.
+@mixin respond-up-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    @media (max-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+  }
+}
+
+// Mixin for min-width media query (desktop-first)
+// Use this mixin when you want to apply styles for viewports with a width greater than the specified breakpoint.
+// For example, `@include respond-above('medium') { ... }` will apply the styles for viewports with a width greater than the 'medium' breakpoint.
+@mixin respond-above($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    @media (min-width: $breakpoint-value + 1px) {
+      @content;
+    }
+  } @else {
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+  }
+}
+
+// Mixin to convert px to rem
+// This mixin takes a pixel value and converts it to rem, based on the $base-font-size
+// For example, `@include px-to-rem(16px)` will output `1rem`
+@function px-to-rem($px) {
+  @return #{$px / $base-font-size}rem;
+}
+
+// Mixin for responsive font size
+// This mixin takes a map of breakpoints and font sizes, and generates media queries to set the font size at each breakpoint
+// The 'base' key is used to set the font size for small screens (i.e., mobile-first approach)
+// For example, `@include font-size(('base': 16px, 'tablet': 18px, 'desktop': 20px))` will set the font size to 16px on small screens, 18px on tablets, and 20px on desktops
+@mixin font-size($sizes-map) {
+  @each $breakpoint, $size in $sizes-map {
+    @if $breakpoint == "base" {
+      font-size: px-to-rem($size);
+    } @else if map-has-key($breakpoints, $breakpoint) {
+      $breakpoint-value: map-get($breakpoints, $breakpoint);
+      @media (min-width: $breakpoint-value + 1px) {
+        font-size: px-to-rem($size);
+      }
+    } @else {
+      @warn 'Invalid breakpoint: #{$breakpoint}.';
+    }
+  }
+}
+
+// Function to convert color to grayscale
+// This function takes a color value and converts it to grayscale
+// For example, `grayscale(#102)` will return a grayscale color value
+@function grayscale($color) {
+  $r: red($color);
+  $g: green($color);
+  $b: blue($color);
+  $gray: 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+
+  @return rgb($gray, $gray, $gray);
+}
+
+// Mixin for creating a simple grid layout
+// This mixin takes the number of columns and the gap between them as arguments.
+// It sets up a CSS grid layout with the specified number of columns and gap.
+// For example, `@include grid-layout(3, 30px);` will create a grid layout with 3 columns and a 30px gap.
+@mixin grid-layout($columns, $gap: 20px) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  grid-gap: px-to-rem($gap);
+}
+
+// Mixin for flex layout
+// This mixin takes the direction, justification, and alignment as arguments.
+// It sets up a flexible box layout with the specified properties.
+// For example, `@include flex-layout(column, center, center);` will create a flex layout with column direction and center alignment and justification.
+@mixin flex-layout($direction: row, $justify: flex-start, $align: stretch) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+}
+
+// Mixin for hiding elements at certain breakpoints
+// This mixin takes a breakpoint as an argument.
+// It hides the element when the viewport width is up to and including the specified breakpoint.
+// For example, `@include hide-at('tablet');` will hide the element at tablet and smaller screen sizes.
+@mixin hide-at($breakpoint) {
+  @include respond-up-to($breakpoint) {
+    display: none;
+  }
+}
+
+// Mixin for showing elements only at certain breakpoints
+// This mixin takes a breakpoint as an argument.
+// It shows the element only when the viewport width is greater than the specified breakpoint.
+// For example, `@include show-only-at('desktop');` will show the element only at desktop and larger screen sizes.
+@mixin show-only-at($breakpoint) {
+  display: none;
+
+  @include respond-above($breakpoint) {
+    display: block;
+  }
+}
+
+// Mixin for aspect ratio boxes
+// This mixin takes the width and height as arguments.
+// It creates a box with the specified aspect ratio.
+// For example, `@include aspect-ratio(16, 9);` will create a box with a 16:9 aspect ratio.
+@mixin aspect-ratio($width, $height) {
+  position: relative;
+  &:before {
+    content: "";
+    display: block;
+    padding-top: ($height / $width) * 100%;
+  }
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
